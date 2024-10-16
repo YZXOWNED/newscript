@@ -1,0 +1,413 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+loadstring(game:HttpGet("https://pastefy.app/DHvG3xGD/raw"))()
+loadstring(game:HttpGet("https://pastefy.app/0q4SGGgC/raw"))()
+
+function mainScript()
+    local Window = OrionLib:MakeWindow({
+        Name = "Counter Bloxs (Updated on 10/15/2024)",
+        HidePremium = false,
+        SaveConfig = true,
+        ConfigFolder = "Cooked.GG"
+    })
+
+    OrionLib:MakeNotification({
+        Name = "ESP",
+        Content = "ESP is Enabled and Head Expander",
+        Image = "rbxassetid://4483345998",
+        Time = 10
+    })
+
+local FlTab = Window:MakeTab({
+        Name = "Updates",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+
+    -- Aimbot Tab
+    local AimbotTab = Window:MakeTab({
+        Name = "Aimbot/Esp/Headexpender",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+-- Toggle for Aimbot
+_G.AimbotEnabled = false
+AimbotTab:AddToggle({
+    Name = "Enable Aimbot",
+    Default = false,
+    Callback = function(Value)
+        _G.AimbotEnabled = Value
+    
+    end
+})
+
+    -- Fly Tab
+    local FlyTab = Window:MakeTab({
+        Name = "Fly & No clip",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+    -- Variables for fly
+    local FlyEnabled = false
+    local FlySpeed = 50
+    local BodyVelocity, BodyGyro
+    local UserInputService = game:GetService("UserInputService")
+    local RunService = game:GetService("RunService")
+    local Players = game:GetService("Players")
+    local Workspace = game:GetService("Workspace")
+    local Camera = Workspace.CurrentCamera
+    local LocalPlayer = Players.LocalPlayer
+    local HumanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+    -- Function to enable fly
+    local function enableFly()
+        if HumanoidRootPart then
+            BodyVelocity = Instance.new("BodyVelocity")
+            BodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            BodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
+            BodyVelocity.P = 1250
+            BodyVelocity.Parent = HumanoidRootPart
+
+            BodyGyro = Instance.new("BodyGyro")
+            BodyGyro.CFrame = Camera.CFrame
+            BodyGyro.MaxTorque = Vector3.new(100000, 100000, 100000)
+            BodyGyro.P = 3000
+            BodyGyro.Parent = HumanoidRootPart
+        end
+    end
+
+    -- Function to disable fly
+    local function disableFly()
+        if BodyVelocity then BodyVelocity:Destroy() end
+        if BodyGyro then BodyGyro:Destroy() end
+    end
+
+    -- Function to toggle fly
+    local function toggleFly()
+        FlyEnabled = not FlyEnabled
+        if FlyEnabled then
+            enableFly()
+        else
+            disableFly()
+        end
+    end
+
+    -- Button to enable fly
+    FlyTab:AddButton({
+        Name = "Enable Fly",
+        Callback = function()
+            toggleFly()
+        end
+    })
+
+    -- Fly movement handler
+    RunService.RenderStepped:Connect(function()
+        if FlyEnabled and HumanoidRootPart then
+            local moveDirection = Vector3.new(0, 0, 0)
+            local cameraCFrame = Camera.CFrame
+
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                moveDirection = moveDirection + cameraCFrame.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                moveDirection = moveDirection - cameraCFrame.LookVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                moveDirection = moveDirection - cameraCFrame.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                moveDirection = moveDirection + cameraCFrame.RightVector
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                moveDirection = moveDirection + Vector3.new(0, 1, 0)
+            end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                moveDirection = moveDirection - Vector3.new(0, 1, 0)
+            end
+
+            if moveDirection.Magnitude > 0 then
+                BodyVelocity.Velocity = moveDirection.Unit * FlySpeed
+            else
+                BodyVelocity.Velocity = Vector3.new(0, 0, 0)
+            end
+
+            BodyGyro.CFrame = cameraCFrame
+        end
+    end)
+
+    -- Listen for character change to reapply fly hack
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        HumanoidRootPart = character:WaitForChild("HumanoidRootPart")
+        if FlyEnabled then
+            enableFly()
+        end
+    end)
+
+    -- Toggle fly with keybind
+    FlyTab:AddBind({
+        Name = "Toggle Fly",
+        Default = Enum.KeyCode.Q,
+        Hold = false,
+        Callback = function()
+            toggleFly()
+        end
+    })
+
+-- Aimbot FOV Slider
+    FlyTab:AddSlider({
+        Name = "Fly Speed",
+        Min = 0,
+        Max = 120,
+        Default = 5,
+        Color = Color3.fromRGB(255, 255, 255),
+        Increment = 1,
+        Callback = function()
+            
+        end
+    })
+
+    -- Aimbot FOV Slider
+    AimbotTab:AddSlider({
+        Name = "FOV for Aimbot",
+        Min = 0,
+        Max = 120,
+        Default = 5,
+        Color = Color3.fromRGB(255, 255, 255),
+        Increment = 1,
+        Callback = function(Value)
+            -- Update FOV logic if needed
+        end
+    })
+    
+-- Initialize services and variables
+local Camera = workspace.CurrentCamera
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local Holding = false
+local LockedTarget = nil
+
+-- Set defaults for aimbot, team check, and FOV circle
+_G.AimbotEnabled = false  -- Aimbot disabled by default
+_G.TeamCheck = false
+_G.AimPart = "Head"
+_G.Sensitivity = 0.1
+_G.CircleSides = 64
+_G.CircleColor = Color3.fromRGB(255, 255, 255)
+_G.CircleTransparency = 0.7
+_G.CircleRadius = 80
+_G.CircleFilled = false
+_G.CircleVisible = false  -- FOV circle hidden initially
+_G.CircleThickness = 0
+
+-- Create the FOV circle
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+FOVCircle.Radius = _G.CircleRadius
+FOVCircle.Filled = _G.CircleFilled
+FOVCircle.Color = _G.CircleColor
+FOVCircle.Visible = _G.CircleVisible
+FOVCircle.Transparency = _G.CircleTransparency
+FOVCircle.NumSides = _G.CircleSides
+FOVCircle.Thickness = _G.CircleThickness
+
+-- Function to get the closest player within the FOV
+local function GetClosestPlayer()
+    local MaximumDistance = _G.CircleRadius
+    local Target = nil
+    local ClosestDistance = MaximumDistance
+
+    for _, v in ipairs(Players:GetPlayers()) do
+        if v.Name ~= LocalPlayer.Name and v.Character and v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Humanoid") and v.Character.Humanoid.Health > 0 then
+            if not _G.TeamCheck or v.Team ~= LocalPlayer.Team then
+                local ScreenPoint = Camera:WorldToScreenPoint(v.Character.HumanoidRootPart.Position)
+                local Distance = (Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y) - Vector2.new(ScreenPoint.X, ScreenPoint.Y)).Magnitude
+
+                if Distance < ClosestDistance then
+                    ClosestDistance = Distance
+                    Target = v
+                end
+            end
+        end
+    end
+
+    return Target
+end
+
+-- Handle input to lock onto a target
+UserInputService.InputBegan:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+        Holding = true
+        if not LockedTarget then
+            LockedTarget = GetClosestPlayer()
+        end
+    end
+end)
+
+-- Reset target lock when mouse button is released
+UserInputService.InputEnded:Connect(function(Input)
+    if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+        Holding = false
+        LockedTarget = nil
+    end
+end)
+
+-- Update the FOV circle and aimbot behavior each frame
+RunService.RenderStepped:Connect(function()
+    -- Update FOV circle position and properties
+    FOVCircle.Position = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+    FOVCircle.Radius = _G.CircleRadius
+    FOVCircle.Filled = _G.CircleFilled
+    FOVCircle.Color = _G.CircleColor
+    FOVCircle.Visible = _G.AimbotEnabled -- Show FOV circle only when aimbot is enabled
+    FOVCircle.Transparency = _G.CircleTransparency
+    FOVCircle.NumSides = _G.CircleSides
+    FOVCircle.Thickness = _G.CircleThickness
+
+    -- Aimbot functionality
+    if Holding and _G.AimbotEnabled and LockedTarget and LockedTarget.Character and LockedTarget.Character:FindFirstChild(_G.AimPart) then
+        local AimPartPosition = LockedTarget.Character[_G.AimPart].Position
+        local TargetCFrame = CFrame.new(Camera.CFrame.Position, AimPartPosition)
+
+        -- Ensure smooth locking and tracking
+        TweenService:Create(Camera, TweenInfo.new(_G.Sensitivity, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {CFrame = TargetCFrame}):Play()
+    end
+end)
+
+    -- Noclip setup
+    local noclip = false
+    local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local noclipConnection
+
+    -- Function to enable noclip
+    local function enableNoclip()
+        noclipConnection = RunService.Stepped:Connect(function()
+            if noclip and character then
+                for _, v in pairs(character:GetDescendants()) do
+                    if v:IsA("BasePart") and v.CanCollide then
+                        v.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end
+
+    -- Function to disable noclip
+    local function disableNoclip()
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+
+        if character then
+            for _, v in pairs(character:GetDescendants()) do
+                if v:IsA("BasePart") and not v.CanCollide then
+                    v.CanCollide = true
+                end
+            end
+        end
+    end
+
+    -- Toggle for noclip
+    FlyTab:AddToggle({
+        Name = "Noclip",
+        Default = false,
+        Callback = function(value)
+            noclip = value
+            if noclip then
+                enableNoclip()
+            else
+                disableNoclip()
+            end
+        end
+    })
+local GunModsTab = Window:MakeTab({
+        Name = "Gun Mods",
+        Icon = "rbxassetid://4483345998",
+        PremiumOnly = false
+    })
+
+local ReplicatedStorage = game.ReplicatedStorage
+local Weapons = ReplicatedStorage.Weapons
+
+    GunModsTab:AddButton({
+        Name = "Enable Fast Fire Rate",
+        Callback = function()
+-- Iterate over all weapons and change non-auto guns to auto
+for _, weapon in ipairs(Weapons:GetChildren()) do
+    local fireRate = weapon:FindFirstChild("FireRate")
+    local auto = weapon:FindFirstChild("Auto") -- Assuming 'Auto' is a BoolValue
+
+    -- Check if Auto exists and is a BoolValue, then set it to true if it isn't already
+    if auto and auto:IsA("BoolValue") then
+        if auto.Value == false then
+            auto.Value = true -- Set non-auto guns to automatic
+        end
+    else
+        -- If no Auto property exists, create it and set to true
+        auto = Instance.new("BoolValue")
+        auto.Name = "Auto"
+        auto.Value = true
+        auto.Parent = weapon
+    end
+    
+    -- Optionally adjust the fire rate for testing purposes
+    if fireRate and fireRate:IsA("NumberValue") then
+        fireRate.Value = 0.01 -- Set fast fire rate for testing
+    end
+end            
+        end
+    })
+
+GunModsTab:AddButton({
+    Name = "Enable No spread And Zero Recoil",
+    Callback = function()
+        for i, v in pairs(Weapons:GetChildren()) do
+            -- Disable spread
+            if v:FindFirstChild("Spread") then
+                local spread = v.Spread
+                for _, spreadProperty in pairs(spread:GetChildren()) do
+                    if spreadProperty:IsA("NumberValue") then
+                        spreadProperty.Value = 0 -- Set all spread sub-properties to 0
+                    end
+                end
+            end
+
+            -- Maximize recoil control
+            if v:FindFirstChild("RecoilControl") then
+                v.RecoilControl.Value = 100 -- Set RecoilControl to maximum
+            end
+        end
+    end
+})
+
+-- More Ammo Button
+    GunModsTab:AddButton({
+        Name = "More Ammo (Not to get banned)",
+        Callback = function()
+            -- Loop through all weapons to modify ammo
+            for i, v in pairs(Weapons:GetChildren()) do
+                -- Set current ammo
+                if v:FindFirstChild("Ammo") then
+                    v.Ammo.Value = 50
+                end
+
+                -- Set stored ammo
+                if v:FindFirstChild("StoredAmmo") then
+                    v.StoredAmmo.Value = 9999
+                end
+            end
+        end
+    })
+
+
+
+
+
+end
+
+mainScript()
